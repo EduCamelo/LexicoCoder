@@ -12,14 +12,12 @@ public class Main {
         char letra;
         String argumentos = "";
 
-        System.out.println("----------código fonte----------");
+        
 
         while (input.hasNextLine()) { // LEMBRAR DAQUELE IF DE UMA LINHA !!!
             argumentos = input.nextLine();
-            Allargs += argumentos; // todos os argumentos
-
-            Allargs += " \n "; // o \n tem que ter esse espaço entre eles, para que não bugue quando for analisar o comentário
-
+            Allargs += argumentos;
+            Allargs += " \n "; 
         }
         lexico.setArgs(Allargs);
         for (int i = 0; i < Allargs.length(); i++) {
@@ -31,7 +29,7 @@ public class Main {
                     lexico.getTokens().add("SimboloEsp: "+letra);
                 }
                 else{
-                    lexico.categorizar(); // categorizando o lexema
+                    lexico.categorizar(); 
                 }
             
             } else {
