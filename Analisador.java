@@ -1,36 +1,28 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-/*  Sumario
- *  para identificar id: 253
- * 
- * 
- * 
- * 
- * 
- * 
- */
+import java.util.ArrayList; // .conteins()
+import java.util.Arrays;   // transformo vetor em arraylist
+import java.util.regex.Matcher;  // Valida expressões regulares
+import java.util.regex.Pattern;  // Faz expressões regulares
 
 public class Analisador {
 
     private ArrayList<String> sysPalavras = new ArrayList<String>();
     private ArrayList<String> Op = new ArrayList<String>();
     private ArrayList<Character> Simb = new ArrayList<Character>();
-    private ArrayList<String> tokens = new ArrayList<String>();
-    private ArrayList<String> simbolos = new ArrayList<String>();
+    private ArrayList<String> simbolosLista= new ArrayList<String>();
+    private ArrayList<String> tokens = new ArrayList<String>();  //  tabela
+    private ArrayList<String> simbolos = new ArrayList<String>(); // tabela
 
     private String aux[] = { "int", "float", "char", "boolean", "void", "if", "else", "for", "while", "scanf",
-            "println", "return" };
+            "println", "return", "public", "private" };
     private String aux2[] = { "=", "+", "-", "*", "/", "%", "&&", "||", "!", "++", "--" };
     private String aux3[] = { ">", ">=", "<", "<=", "!=", "==" };
 
-    private int pos;
-    private int idCont;
+    private int pos;    // posição atual do meu argumento  Obs: ele é utilizadado para comentários
+    private int idCont; // contagem de id's
 
-    private String lexema = "";
-    private String args = "";
-    private Pattern id = Pattern.compile("[a-zA-Z][a-zA-Z0-9]*");
+    private String lexema = ""; // palavra
+    private String args = "";  // argumentos que foram passado lá no inicio. Obs: ele é utilizadado para comentários
+    private Pattern id = Pattern.compile("[a-zA-Z][a-zA-Z0-9]*"); // expressão fofa
 
     public Analisador() {
         sysPalavras.addAll(Arrays.asList(aux));
@@ -44,6 +36,7 @@ public class Analisador {
         this.Simb.add('}');
         this.Simb.add(',');
         this.Simb.add(';');
+        this.Simb.add('.');
 
     }
 
@@ -138,46 +131,49 @@ public class Analisador {
     // Criar situações
 
     public void categorizar() {
-        if (this.lexema == "") {
+        if (this.lexema == "") {    // Para de categorizar;
             return;
-        } else if (Operador(lexema)) {
+        } else if (Operador(lexema)) { // reconhece o operador
             this.tokens.add("Operador: " + lexema);
             this.lexema = "";
-        } else if (isNum(lexema)) {
-            if (NumInt(lexema)) {
+        } else if (isNum(lexema)) { // reconhece como número
+            if (NumInt(lexema)) {  // reconhece número inteiro
                 this.tokens.add("Num_int: " + lexema);
-            } else if (NumDouble(lexema)) {
+                this.lexema = "";
+            } else if (NumDouble(lexema)) {// reconhece número double
                 this.tokens.add("Num_double: " + lexema);
                 this.lexema = "";
             }
-        } else if (sysPalavras(lexema)) {
+        } else if (sysPalavras(lexema)) { // reconhece palavras do sistema
             this.tokens.add("Palavra do Sys: " + lexema);
             this.lexema = "";
-        } else if (Ids(lexema)) {
-            if (SinsID(lexema)) {
+        } else if (Ids(lexema)) {  // reconhece o id
+            if (SinsID(lexema)) {  // reconhece se já tem na lista de simbolos
                 for (int i = 0; i < simbolos.size(); i++) {
-                    if (simbolos.get(i).equals(lexema)) {
+                    if (simbolosLista.get(i).equalsIgnoreCase(lexema)) {
                         i++;
                         this.tokens.add("id(" + i + "): " + lexema);
                     }
                 }
                 this.lexema = "";
-            } else {
+            } else {// se não add as coisas
                 idCont++;
+                this.tokens.add("Id(" + this.idCont + "): " + lexema);
                 this.simbolos.add("Id(" + this.idCont + "): " + lexema);
+                this.simbolosLista.add(lexema);
                 this.lexema = "";
             }
-        } else if (texto(lexema)) {
+        } else if (texto(lexema)) { // Reconhece o testo
             this.tokens.add("Texto: " + lexema);
             this.lexema = "";
-        } else if (comentario(lexema)) {
+        } else if (comentario(lexema)) {// valida se é um comentário
             for (int i = this.pos; this.args.charAt(i) != '\n'; i++) {
                 this.pos = i;
                 this.lexema += this.args.charAt(i);
             }
             System.out.println("Comentário em linha: " + this.lexema);
             this.lexema = "";
-        } else if (lexema.equals("\n")) {
+        } else if (lexema.equals("\n")) {// identifica uma quebra de linha
             lexema = "";
             this.lexema = "";
         } else {
@@ -187,9 +183,14 @@ public class Analisador {
     }
 
     public void lista() {
+        System.out.println("Lista de Simbolos: ");
         for (int i = 0; i < simbolos.size(); i++) {
             System.out.println(simbolos.get(i));
         }
+
+        System.out.println(" ");
+
+        System.out.println("Tabela de tokens: ");
         for (int i = 0; i < tokens.size(); i++) {
             System.out.println(tokens.get(i));
         }
@@ -242,6 +243,7 @@ public class Analisador {
 
     private boolean isNum(String lexema) {
         if (lexema.isEmpty() || lexema.charAt(0) == '.' || lexema.charAt(lexema.length() - 1) == '.') {
+            return false;
         }
         int count = 0;
         for (int i = 0; i < lexema.length(); i++) {
@@ -260,12 +262,12 @@ public class Analisador {
     }
 
     private boolean Ids(String lexema) {
-        Matcher matcher = id.matcher(this.lexema);
+        Matcher matcher = id.matcher(lexema);
         return matcher.matches();
     }
 
     private boolean SinsID(String lexema) {
-        return this.simbolos.contains(lexema);
+        return this.simbolosLista.contains(lexema);
     }
 
     private boolean texto(String lexema) {
