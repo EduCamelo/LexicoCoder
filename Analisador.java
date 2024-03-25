@@ -171,7 +171,7 @@ public class Analisador {
                 this.pos = i;
                 this.lexema += this.args.charAt(i);
             }
-            System.out.println("Comentário em linha: " + this.lexema);
+      //      System.out.println("Comentário em linha: " + this.lexema);
             this.lexema = "";
         } else if (lexema.equals("\n")) {// identifica uma quebra de linha
             lexema = "";
