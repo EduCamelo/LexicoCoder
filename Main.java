@@ -8,8 +8,8 @@ import java.util.Scanner;
 public class Main {
     public static void main(String args[]) throws FileNotFoundException {
         File arquivo = new File(
-                "C:\\Users\\vanpe\\OneDrive\\Área de Trabalho\\Pastas\\Programação\\compiladores/codigofonte.txt"); // pega
-                                                                                                                    // arquivo.txt
+                "C:\\Users\\vanpe\\OneDrive\\Área de Trabalho\\Pastas\\Programação\\compiladores\\teste.txt"); // pega os testes
+                                                                                                                    
         Analisador lexico = new Analisador(); // chama o nosso analisador
         @SuppressWarnings("resource") // resolver o bug do input
         Scanner input = new Scanner(arquivo); // lê o arquivo
@@ -30,13 +30,10 @@ public class Main {
             letra = Allargs.charAt(i); // Pega letra por letra
             lexico.setPos(i); // setar o local de onde parou.
 
-            if (letra == ' ' || lexico.SimboloEspc(letra)) { // vai até formar uma palavra
-                if (lexico.SimboloEspc(letra)) { // Valida se é um simbEsp
-                    lexico.getTokens().add("SimboloEsp: " + letra);
-                } else {
-                    lexico.categorizar(); // faz a categorização da palavra
-                }
-
+            if (letra == ' ') { // vai até formar uma palavra
+                lexico.categorizar(); // faz a categorização da palavra
+            } else if (lexico.SimboloEspc(letra)) { // Valida se é um simbEsp
+                lexico.getTokens().add("SimboloEsp: " + letra);
             } else if (letra == '"') {// valida as "
                 lexico.setChar(letra);
                 do {
@@ -48,10 +45,11 @@ public class Main {
             } else {
                 lexico.setChar(letra); // incrementa todos os caracteres para formar o lexema
             }
+            i = lexico.getPos();// garante que eu vou pular os comentários
         }
         lexico.lista();
         System.out.println("");
-        System.out.println("Todos os argumentos: ");
+        System.out.println("Todos os argumentos em ordem: ");
         System.out.println(lexico.getArgs());
     }
 }

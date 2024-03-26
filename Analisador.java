@@ -22,7 +22,7 @@ public class Analisador {
 
     private String lexema = ""; // palavra
     private String args = "";  // argumentos que foram passado lá no inicio. Obs: ele é utilizadado para comentários
-    private Pattern id = Pattern.compile("[a-zA-Z][a-zA-Z0-9]*"); // expressão fofa
+    private Pattern id = Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9]*"); // expressão fofa
 
     public Analisador() {
         sysPalavras.addAll(Arrays.asList(aux));
@@ -36,7 +36,6 @@ public class Analisador {
         this.Simb.add('}');
         this.Simb.add(',');
         this.Simb.add(';');
-        this.Simb.add('.');
 
     }
 
@@ -167,11 +166,10 @@ public class Analisador {
             this.tokens.add("Texto: " + lexema);
             this.lexema = "";
         } else if (comentario(lexema)) {// valida se é um comentário
-            for (int i = this.pos; this.args.charAt(i) != '\n'; i++) {
+
+            for (int i = this.pos; this.args.charAt(i) != '\n'; i++) { 
                 this.pos = i;
-                this.lexema += this.args.charAt(i);
             }
-      //      System.out.println("Comentário em linha: " + this.lexema);
             this.lexema = "";
         } else if (lexema.equals("\n")) {// identifica uma quebra de linha
             lexema = "";
@@ -216,7 +214,7 @@ public class Analisador {
 
         for (int i = 0; i < lexema.length(); i++) {
             char letra = lexema.charAt(i);
-            if (!(letra >= '0' && letra <= '9') && letra != '.') {
+            if (!(letra >= '0' && letra <= '9') && letra == '.') {
                 return false;
             }
 
@@ -224,21 +222,14 @@ public class Analisador {
         return true;
     }
 
-    public boolean NumDouble(String lexema) {
-        boolean flag = false;
+    private boolean NumDouble(String lexema) {
         for (int i = 0; i < lexema.length(); i++) {
-            char letra = lexema.charAt(i);
-
-            if (letra == '.' && lexema.length() - i > 0
-                    && (lexema.charAt(i + 1) >= '0' && lexema.charAt(i + 1) <= '9')) {
-                flag = true;
+            char letra= lexema.charAt(i);
+            if (letra == '.') {
+                return true;
             }
-            if (letra != '.' && (letra >= '0' && letra <= '9')) {
-                flag = false;
-            }
-
         }
-        return flag;
+        return false;
     }
 
     private boolean isNum(String lexema) {
